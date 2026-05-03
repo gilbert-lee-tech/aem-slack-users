@@ -227,6 +227,57 @@ SLACK_CACHE_TTL=0 python3 check_aemcs_slack_status.py
 
 ---
 
+### aem-slack-users MCP server (Claude Code)
+
+**List all deactivated Slack users**
+```
+> List all deactivated users in Slack
+Found 3 deactivated users in your Slack workspace:
+
+  U04XYZ789    Bob Lee          bob.lee@company.com
+  U09ABC123    Carol White      carol.white@company.com
+  U11DEF456    Dave Brown       dave.brown@company.com
+```
+
+**Cross-reference AEM on-prem users against Slack**
+```
+> Cross-reference all AEM users against Slack and tell me who is deactivated
+Fetched 42 AEM users from http://localhost:4502 and checked them against 198 Slack users.
+
+Deactivated (4):
+  bob.lee@company.com        Bob Lee
+  carol.white@company.com    Carol White
+  dave.brown@company.com     Dave Brown
+  eve.jones@company.com      Eve Jones
+
+Not found in Slack (3):
+  contractor1@agency.com
+  vendor2@partner.com
+  svc-account@company.com
+
+Results written to aem_slack_report_20260502_120000.json
+```
+
+**Cross-reference AEM as a Cloud Service users against Slack**
+```
+> Which AEMaaCS users on our prod environment have been deactivated in Slack?
+Fetched an access token using OAuth Server-to-Server credentials.
+Fetched 150 AEM users from https://author-p12345-e67890.adobeaemcloud.com.
+Using cached Slack user list (312s old, TTL=3600s) — 198 users loaded.
+
+Deactivated (6):
+  alice.smith@company.com      Alice Smith
+  bob.lee@company.com          Bob Lee
+  carol.white@company.com      Carol White
+  dave.brown@company.com       Dave Brown
+  eve.jones@company.com        Eve Jones
+  frank.miller@company.com     Frank Miller
+
+Results written to aemcs_slack_report_20260502_120000.json
+```
+
+---
+
 ## Slack MCP server (optional)
 
 For ad-hoc interactive Slack queries, the official Slack MCP server can also be registered with Claude Code:
