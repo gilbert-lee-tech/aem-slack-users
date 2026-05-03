@@ -1,0 +1,23 @@
+# Secrets
+.env
+service_credentials.json
+*.pem
+
+# Runtime cache files (contain live API tokens / user data)
+.aem_token_cache.json
+.slack_users_cache.json
+
+# Script output files (contain real user data)
+aem_slack_report_*.json
+aemcs_slack_report_*.json
+slack_status_*.json
+slack_users_*.json
+slack_deactivated_*.json
+
+# Claude Code local config (may contain tokens in permission rules)
+.claude/
+
+# Python
+.venv/
+__pycache__/
+*.pyc

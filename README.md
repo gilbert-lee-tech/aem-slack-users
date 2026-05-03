@@ -1,0 +1,134 @@
+# aem-slack-users
+
+A collection of Python scripts to cross-reference AEM users against Slack and report on account status (active, deactivated, not found).
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `list_slack_users.py` | List all Slack workspace members including deactivated |
+| `list_deactivated_users.py` | List only deactivated Slack users |
+| `check_slack_status.py` | Check a generic API user list against Slack |
+| `check_aem_slack_status.py` | Cross-reference AEM on-prem/local users against Slack |
+| `check_aemcs_slack_status.py` | Cross-reference AEM as a Cloud Service users against Slack |
+
+## Setup
+
+### 1. Python environment
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Slack Bot Token
+
+1. Go to https://api.slack.com/apps → **Create New App** → From scratch
+2. Under **OAuth & Permissions → Bot Token Scopes**, add:
+   - `users:read`
+   - `users:read.email`
+3. Click **Install to Workspace** → copy the **Bot User OAuth Token** (`xoxb-...`)
+
+### 3. Environment variables
+
+```bash
+cp .env.example .env
+# Edit .env with your values
+```
+
+## Usage
+
+### List all Slack users
+
+```bash
+python3 list_slack_users.py
+```
+
+Outputs a formatted table and writes `slack_users_<timestamp>.json`.
+
+### List deactivated Slack users
+
+```bash
+python3 list_deactivated_users.py
+```
+
+Outputs a formatted table and writes `slack_deactivated_<timestamp>.json`.
+
+### Check AEM on-prem users against Slack
+
+Requires a local AEM instance (default: `http://localhost:4502`).
+
+```env
+AEM_URL=http://localhost:4502
+AEM_USERNAME=admin
+AEM_PASSWORD=admin
+```
+
+```bash
+python3 check_aem_slack_status.py
+```
+
+### Check AEM as a Cloud Service users against Slack
+
+1. Download **Service Credentials** from Cloud Manager:
+   **Environments → [env] → Developer Console → Integrations → Service Credentials → Download**
+
+2. Set in `.env`:
+   ```env
+   AEM_URL=https://author-p<PROGRAM_ID>-e<ENV_ID>.adobeaemcloud.com
+   AEM_SERVICE_CREDENTIALS_FILE=./service_credentials.json
+   ```
+
+3. Run:
+   ```bash
+   python3 check_aemcs_slack_status.py
+   ```
+
+Both AEM scripts look up users by `rep:principalName` (the AEM user ID, which is expected to be an email address) against Slack. They write `aem_slack_report_<timestamp>.json` / `aemcs_slack_report_<timestamp>.json`.
+
+## Output format
+
+Each result record contains:
+
+```json
+{
+  "aem_path": "/home/users/a/jsmith",
+  "aem_username": "jsmith@company.com",
+  "email": "jsmith@company.com",
+  "aem_display_name": "John Smith",
+  "slack_status": "active | deactivated | not_found",
+  "slack_user_id": "U01ABC123",
+  "slack_display_name": "John Smith"
+}
+```
+
+## Caching
+
+To avoid hitting Slack API rate limits on large workspaces, Slack user data is cached locally:
+
+| Cache file | TTL | Controls |
+|------------|-----|---------|
+| `.slack_users_cache.json` | 1 hour | `SLACK_CACHE_TTL=<seconds>` in `.env` |
+| `.aem_token_cache.json` | Until token expiry | Delete to force refresh |
+
+To force a fresh Slack fetch:
+```bash
+rm .slack_users_cache.json
+# or
+SLACK_CACHE_TTL=0 python3 check_aemcs_slack_status.py
+```
+
+## Slack MCP server (optional)
+
+For interactive ad-hoc queries, a Slack MCP server can be registered with Claude Code:
+
+```bash
+claude mcp add slack \
+  -e SLACK_BOT_TOKEN=xoxb-... \
+  -e SLACK_TEAM_ID=T... \
+  -- npx -y @modelcontextprotocol/server-slack
+```
+
+Once registered, start a new Claude Code session and ask questions like:
+> "Is john.smith@company.com active or deactivated in Slack?"
