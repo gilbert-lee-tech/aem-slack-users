@@ -1,6 +1,6 @@
 # aem-slack-users
 
-A collection of Python scripts to cross-reference AEM users against Slack and report on account status (active, deactivated, not found).
+Cross-reference AEM users against Slack to identify deactivated accounts. Available as standalone Python scripts or as an MCP server for interactive use inside Claude Code.
 
 ## Scripts
 
@@ -11,6 +11,27 @@ A collection of Python scripts to cross-reference AEM users against Slack and re
 | `check_slack_status.py` | Check a generic API user list against Slack |
 | `check_aem_slack_status.py` | Cross-reference AEM on-prem/local users against Slack |
 | `check_aemcs_slack_status.py` | Cross-reference AEM as a Cloud Service users against Slack |
+
+## MCP server
+
+`server.py` exposes the same functionality as MCP tools so Claude Code can call them interactively in conversation.
+
+| Tool | Description |
+|------|-------------|
+| `list_slack_users` | List all Slack workspace members including deactivated |
+| `list_deactivated_slack_users` | List only deactivated Slack members |
+| `check_aem_users` | Cross-reference AEM on-prem users against Slack |
+| `check_aemcs_users` | Cross-reference AEM as a Cloud Service users against Slack |
+
+### Register the MCP server with Claude Code
+
+```bash
+claude mcp add aem-slack-users -- /path/to/.venv/bin/python3 /path/to/server.py
+```
+
+Once registered, start a new Claude Code session and ask questions like:
+> "List all deactivated users in Slack"
+> "Cross-reference AEM users against Slack and show me who is deactivated"
 
 ## Setup
 
@@ -208,7 +229,7 @@ SLACK_CACHE_TTL=0 python3 check_aemcs_slack_status.py
 
 ## Slack MCP server (optional)
 
-For interactive ad-hoc queries, a Slack MCP server can be registered with Claude Code:
+For ad-hoc interactive Slack queries, the official Slack MCP server can also be registered with Claude Code:
 
 ```bash
 claude mcp add slack \
