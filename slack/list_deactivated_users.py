@@ -2,40 +2,27 @@ import json
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dotenv import load_dotenv
-from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+
+from slack.helpers import fetch_all_slack_members, get_slack_client
 
 load_dotenv()
 
-SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
-
-
-def fetch_all_users(client: WebClient) -> list[dict]:
-    members = []
-    cursor = None
-    while True:
-        kwargs = {"limit": 200}
-        if cursor:
-            kwargs["cursor"] = cursor
-        resp = client.users_list(**kwargs)
-        members.extend(resp["members"])
-        cursor = resp.get("response_metadata", {}).get("next_cursor")
-        if not cursor:
-            break
-    return members
-
 
 def main():
-    if not SLACK_BOT_TOKEN:
+    if not os.getenv("SLACK_BOT_TOKEN"):
         sys.exit("Error: SLACK_BOT_TOKEN is not set. Copy .env.example to .env and fill it in.")
 
-    client = WebClient(token=SLACK_BOT_TOKEN)
+    client = get_slack_client()
 
     print("Fetching users from Slack...")
     try:
-        raw_members = fetch_all_users(client)
+        raw_members = fetch_all_slack_members(client)
     except SlackApiError as e:
         sys.exit(f"Slack API error: {e.response['error']}")
 

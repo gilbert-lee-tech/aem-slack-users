@@ -21,13 +21,17 @@ python3 -m venv .venv
 
 ## Scripts
 
+Scripts are organised into `slack/` and `aem/` packages mirroring the MCP server tool groups.
+
 | Script | Purpose |
 |--------|---------|
-| `list_slack_users.py` | List all Slack members (active + deactivated) |
-| `list_deactivated_users.py` | List only deactivated Slack members |
-| `check_aem_slack_status.py` | AEM on-prem (Basic Auth) → Slack cross-reference |
-| `check_aemcs_slack_status.py` | AEM as a Cloud Service (Adobe IMS) → Slack cross-reference |
-| `check_slack_status.py` | Generic API endpoint → Slack cross-reference |
+| `slack/list_slack_users.py` | List all Slack members (active + deactivated) |
+| `slack/list_deactivated_users.py` | List only deactivated Slack members |
+| `aem/check_aem_slack_status.py` | AEM on-prem (Basic Auth) → Slack cross-reference |
+| `aem/check_aemcs_slack_status.py` | AEM as a Cloud Service (Adobe IMS) → Slack cross-reference |
+| `aem/check_slack_status.py` | Generic API endpoint → Slack cross-reference |
+
+Shared helpers live in `slack/helpers.py`, `aem/helpers.py`, and `aem/auth.py`.
 
 ## Key design decisions
 
@@ -66,7 +70,7 @@ Registered locally for this project:
 claude mcp get slack
 ```
 
-The MCP server (`@modelcontextprotocol/server-slack`) enables interactive Slack queries in Claude Code sessions but does not expose a user listing tool — use `list_slack_users.py` for bulk operations. MCP tools are only available in sessions started after the server was registered.
+The MCP server (`@modelcontextprotocol/server-slack`) enables interactive Slack queries in Claude Code sessions but does not expose a user listing tool — use `slack/list_slack_users.py` for bulk operations. MCP tools are only available in sessions started after the server was registered.
 
 ## Output files
 

@@ -6,11 +6,11 @@ Cross-reference AEM users against Slack to identify deactivated accounts. Availa
 
 | Script | Description |
 |--------|-------------|
-| `list_slack_users.py` | List all Slack workspace members including deactivated |
-| `list_deactivated_users.py` | List only deactivated Slack users |
-| `check_slack_status.py` | Check a generic API user list against Slack |
-| `check_aem_slack_status.py` | Cross-reference AEM on-prem/local users against Slack |
-| `check_aemcs_slack_status.py` | Cross-reference AEM as a Cloud Service users against Slack |
+| `slack/list_slack_users.py` | List all Slack workspace members including deactivated |
+| `slack/list_deactivated_users.py` | List only deactivated Slack users |
+| `aem/check_slack_status.py` | Check a generic API user list against Slack |
+| `aem/check_aem_slack_status.py` | Cross-reference AEM on-prem/local users against Slack |
+| `aem/check_aemcs_slack_status.py` | Cross-reference AEM as a Cloud Service users against Slack |
 
 ## MCP server
 
@@ -63,7 +63,7 @@ cp .env.example .env
 ### List all Slack users
 
 ```bash
-python3 list_slack_users.py
+python3 slack/list_slack_users.py
 ```
 
 Outputs a formatted table and writes `slack_users_<timestamp>.json`.
@@ -71,7 +71,7 @@ Outputs a formatted table and writes `slack_users_<timestamp>.json`.
 ### List deactivated Slack users
 
 ```bash
-python3 list_deactivated_users.py
+python3 slack/list_deactivated_users.py
 ```
 
 Outputs a formatted table and writes `slack_deactivated_<timestamp>.json`.
@@ -87,7 +87,7 @@ AEM_PASSWORD=admin
 ```
 
 ```bash
-python3 check_aem_slack_status.py
+python3 aem/check_aem_slack_status.py
 ```
 
 ### Check AEM as a Cloud Service users against Slack
@@ -103,7 +103,7 @@ python3 check_aem_slack_status.py
 
 3. Run:
    ```bash
-   python3 check_aemcs_slack_status.py
+   python3 aem/check_aemcs_slack_status.py
    ```
 
 Both AEM scripts look up users by `rep:principalName` (the AEM user ID, which is expected to be an email address) against Slack. They write `aem_slack_report_<timestamp>.json` / `aemcs_slack_report_<timestamp>.json`.
@@ -137,7 +137,7 @@ To force a fresh Slack fetch:
 ```bash
 rm .slack_users_cache.json
 # or
-SLACK_CACHE_TTL=0 python3 check_aemcs_slack_status.py
+SLACK_CACHE_TTL=0 python3 aem/check_aemcs_slack_status.py
 ```
 
 ## Examples
@@ -146,7 +146,7 @@ SLACK_CACHE_TTL=0 python3 check_aemcs_slack_status.py
 
 **List all workspace members and their status**
 ```bash
-python3 list_slack_users.py
+python3 slack/list_slack_users.py
 ```
 ```
 STATUS       KIND                   NAME                                EMAIL
@@ -159,7 +159,7 @@ active       bot                    Slackbot
 
 **Find all deactivated users**
 ```bash
-python3 list_deactivated_users.py
+python3 slack/list_deactivated_users.py
 ```
 ```
 Deactivated users: 1
@@ -183,7 +183,7 @@ bob.lee@company.com is deactivated in your Slack workspace (user ID: U04XYZ789).
 
 **Cross-reference all AEM on-prem users against Slack**
 ```bash
-python3 check_aem_slack_status.py
+python3 aem/check_aem_slack_status.py
 ```
 ```
 Fetching users from AEM at http://localhost:4502 ...
@@ -205,7 +205,7 @@ Total AEM users checked: 42
 
 **Cross-reference AEM as a Cloud Service users against Slack**
 ```bash
-python3 check_aemcs_slack_status.py
+python3 aem/check_aemcs_slack_status.py
 ```
 ```
 Fetching Adobe IMS access token ...
@@ -222,7 +222,7 @@ Done. Results written to aemcs_slack_report_20260502_120000.json
 
 **Force a fresh Slack user fetch (bypass cache)**
 ```bash
-SLACK_CACHE_TTL=0 python3 check_aemcs_slack_status.py
+SLACK_CACHE_TTL=0 python3 aem/check_aemcs_slack_status.py
 ```
 
 ---
