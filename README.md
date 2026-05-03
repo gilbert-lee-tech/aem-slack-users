@@ -119,6 +119,93 @@ rm .slack_users_cache.json
 SLACK_CACHE_TTL=0 python3 check_aemcs_slack_status.py
 ```
 
+## Examples
+
+### Slack
+
+**List all workspace members and their status**
+```bash
+python3 list_slack_users.py
+```
+```
+STATUS       KIND                   NAME                                EMAIL
+------------------------------------------------------------------------------------------
+active       full_member            Jane Smith                          jane.smith@company.com
+active       full_member            John Doe                            john.doe@company.com
+deactivated  full_member            Bob Lee                             bob.lee@company.com
+active       bot                    Slackbot
+```
+
+**Find all deactivated users**
+```bash
+python3 list_deactivated_users.py
+```
+```
+Deactivated users: 1
+
+USER ID      NAME                                EMAIL
+---------------------------------------------------------------------------
+U04XYZ789    Bob Lee                             bob.lee@company.com
+
+Results written to slack_deactivated_20260502_120000.json
+```
+
+**Check a specific user's Slack status via the MCP server (Claude Code)**
+```
+> Is bob.lee@company.com active or deactivated in Slack?
+bob.lee@company.com is deactivated in your Slack workspace (user ID: U04XYZ789).
+```
+
+---
+
+### AEM
+
+**Cross-reference all AEM on-prem users against Slack**
+```bash
+python3 check_aem_slack_status.py
+```
+```
+Fetching users from AEM at http://localhost:4502 ...
+Found 42 AEM users to check (system/anonymous accounts excluded).
+Loading Slack user list (including deactivated) ...
+Loaded 198 Slack users into lookup map.
+  jane.smith@company.com                   active
+  john.doe@company.com                     active
+  bob.lee@company.com                      deactivated
+  carol.white@company.com                  not_found
+  ...
+
+Done. Results written to aem_slack_report_20260502_120000.json
+Total AEM users checked: 42
+  active: 35
+  deactivated: 4
+  not_found: 3
+```
+
+**Cross-reference AEM as a Cloud Service users against Slack**
+```bash
+python3 check_aemcs_slack_status.py
+```
+```
+Fetching Adobe IMS access token ...
+  Used OAuth Server-to-Server (new format).
+Fetching users from AEM at https://author-p12345-e67890.adobeaemcloud.com ...
+Found 150 AEM users to check (system/anonymous accounts excluded).
+Loading Slack user list (including deactivated) ...
+Using cached Slack user list (312s old, TTL=3600s).
+Loaded 198 Slack users into lookup map.
+  ...
+
+Done. Results written to aemcs_slack_report_20260502_120000.json
+```
+
+**Force a fresh Slack user fetch (bypass cache)**
+```bash
+SLACK_CACHE_TTL=0 python3 check_aemcs_slack_status.py
+```
+
+---
+
 ## Slack MCP server (optional)
 
 For interactive ad-hoc queries, a Slack MCP server can be registered with Claude Code:
